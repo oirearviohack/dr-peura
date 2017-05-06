@@ -3,9 +3,6 @@ console.log( "loading js" );
 // "session"
 userName = "";
 
-// TODO: Move this to oda-phr
-theData = [];
-
 function storeFeedback(happyOrSad, callback) {
   var time = moment().format();
   var jsonData = createObservation(happyOrSad);
@@ -13,13 +10,22 @@ function storeFeedback(happyOrSad, callback) {
   console.log("Storing " + happyOrSad + "!");
   // POST https://oda.medidemo.fi/phr/baseDstu3/Observation?_format=json&_pretty=true
   // theData.push({'time': time, 'result': happyOrSad});
-  $.post(
-    "https://oda.medidemo.fi/phr/baseDstu3/Observation?_format=json&_pretty=true",
-    jsonData,
-    callback,
-    "application/fhir+json; charset=UTF-8"
-  );
+
+  $.ajax({
+      type: "POST",
+      url: "https://oda.medidemo.fi/phr/baseDstu3/Observation?_format=json&_pretty=true",
+      // The key needs to match your method's input parameter (case-sensitive).
+      data: JSON.stringify(jsonData),
+      contentType: "application/fhir+json; charset=UTF-8",
+      dataType: "json",
+      success: callback,
+      failure: function(errMsg) {
+          alert(errMsg);
+      }
+  });
 }
+
+// https://oda.medidemo.fi/phr/baseDstu3/Observation?code=http://snomed.info/sct|49727002&_pretty=true
 
 function createObservation(result) {
   return {
@@ -28,6 +34,13 @@ function createObservation(result) {
       "versionId": "1"
     },
     "code": {
+      "coding": [
+        {
+          "system": "https://github.com/oirearviohack/dr-peura",
+          "code": "1",
+          "display": "Miten menee"
+        }
+      ],
       "text": "Miten menee"
     },
     "status": "final",
@@ -39,42 +52,62 @@ function createObservation(result) {
   }
 }
 
-function loadResults() {
-  return theData;
+function loadResults(callback) {
+  var url ="https://oda.medidemo.fi/phr/baseDstu3/Observation?patient=Patient%2F" + userName + "&code=https%3A%2F%2Fgithub.com%2Foirearviohack%2Fdr-peura%7C1&_count=1000&_pretty=true"
+
+  // https%3A%2F%2Fgithub.com%2Foirearviohack%2Fdr-peura%7C1
+  // patient=Patient%2FPATIENT1
+  // patient=Patient/PATIENT1&_format=json&_pretty=true
+  // https://oda.medidemo.fi/phr/baseDstu3/Observation?patient=Patient/PATIENT1&code=https://github.com/oirearviohack/dr-peura|1&_pretty=true
+
+  $.getJSON(url, function(result) {
+    var resultsArray = result.entry;
+    console.log(result.entry);
+
+    var dataArray = resultsArray.map(function(item) {
+      return { result: item.resource.valueString, time: item.resource.effectiveDateTime };
+    });
+
+    callback(dataArray);
+  });
 }
 
 
 // TODO: Implement learning algorithm here to forward user to professional care.
 function analyzeResults() {
-  var sadCount = theData.slice().reverse().slice(0,5).filter(function(item) {
-    return item.result == "sad";
-  }).length
+  loadResults(function(results) {
+    var sadCount = results.slice().reverse().slice(0,5).filter(function(item) {
+      return item.result == "sad";
+    }).length
 
-  console.log("sadCount: " + sadCount);
+    console.log("sadCount: " + sadCount);
 
-  if (sadCount >= 5) {
-    selectPage("call-help-page");
-  }
+    if (sadCount >= 5) {
+      selectPage("call-help-page");
+    }
+  });
 }
 
 function renderResultsPage() {
   clearResultsPage();
 
   // slice makes a copy of the array:
-  var results = loadResults().slice().reverse();
-  var $resultContainer = $('div#results');
-  results.forEach(function(element) {
-    console.log(element);
+  loadResults(function (results) {
+    results.slice().reverse();
+    var $resultContainer = $('div#results');
+    results.forEach(function(element) {
+      console.log(element);
 
-    var time = moment(element.time).fromNow();
-    var face = "";
-    if (element.result === "happy") {
-      face="Hymynaama.png";
-    } else if (element.result === "sad") {
-      face="Surunaama.png";
-    }
-    $item = $('<div>' + '<img src=' + face + '>' + ' ' + time + '</div>');
-    $resultContainer.append($item);
+      var time = moment(element.time).fromNow();
+      var face = "";
+      if (element.result === "happy") {
+        face="Hymynaama.png";
+      } else if (element.result === "sad") {
+        face="Surunaama.png";
+      }
+      $item = $('<div>' + '<img src=' + face + '>' + ' ' + time + '</div>');
+      $resultContainer.append($item);
+    });
   });
 }
 
@@ -108,9 +141,9 @@ $( document ).ready(function() {
     });
 
     $('form#login-form input.mui-btn').click( function() {
-      var $userNameElement = $('form.login-form input');
-      var username = $userNameElement.attr('value');
-      userName = username;
+      var $userNameElement = $('input#user-name');
+      userName = $userNameElement.val();
+      console.log("Login as " + userName, $userNameElement);
       selectPage('feedback-page');
       return false;
     });
@@ -124,9 +157,13 @@ $( document ).ready(function() {
       console.log("clikced: " + imgId);
 
       if (imgId.indexOf('happy') > -1) {
-        storeFeedback('happy');
+        storeFeedback('happy', function(result) {
+          console.log("RESULT: ", result);
+        });
       } else {
-        storeFeedback('sad');
+        storeFeedback('sad', function(result) {
+          console.log("RESULT: ", result);
+        });
       }
 
       $feedbackButtons.attr("disabled", true);
