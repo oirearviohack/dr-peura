@@ -25,8 +25,6 @@ function storeFeedback(happyOrSad, callback) {
   });
 }
 
-// https://oda.medidemo.fi/phr/baseDstu3/Observation?code=http://snomed.info/sct|49727002&_pretty=true
-
 function createObservation(result) {
   return {
     "resourceType": "Observation",
@@ -55,18 +53,13 @@ function createObservation(result) {
 function loadResults(callback) {
   var url ="https://oda.medidemo.fi/phr/baseDstu3/Observation?patient=Patient%2F" + userName + "&code=https%3A%2F%2Fgithub.com%2Foirearviohack%2Fdr-peura%7C1&_count=1000&_pretty=true"
 
-  // https%3A%2F%2Fgithub.com%2Foirearviohack%2Fdr-peura%7C1
-  // patient=Patient%2FPATIENT1
-  // patient=Patient/PATIENT1&_format=json&_pretty=true
-  // https://oda.medidemo.fi/phr/baseDstu3/Observation?patient=Patient/PATIENT1&code=https://github.com/oirearviohack/dr-peura|1&_pretty=true
-
   $.getJSON(url, function(result) {
     var resultsArray = result.entry;
     console.log(result.entry);
 
     var dataArray = resultsArray.map(function(item) {
       return { result: item.resource.valueString, time: item.resource.effectiveDateTime };
-    });
+    }).sort(function(a, b) { return a.time.localeCompare(b.time); }).reverse();
 
     callback(dataArray);
   });
@@ -76,9 +69,9 @@ function loadResults(callback) {
 // TODO: Implement learning algorithm here to forward user to professional care.
 function analyzeResults() {
   loadResults(function(results) {
-    var sadCount = results.slice().reverse().slice(0,5).filter(function(item) {
+    var sadCount = results.slice(0,5).filter(function(item) {
       return item.result == "sad";
-    }).length
+    }).length;
 
     console.log("sadCount: " + sadCount);
 
@@ -93,7 +86,6 @@ function renderResultsPage() {
 
   // slice makes a copy of the array:
   loadResults(function (results) {
-    results.slice().reverse();
     var $resultContainer = $('div#results');
     results.forEach(function(element) {
       console.log(element);
@@ -101,11 +93,11 @@ function renderResultsPage() {
       var time = moment(element.time).fromNow();
       var face = "";
       if (element.result === "happy") {
-        face="Hymynaama.png";
+        face="Hymynaama_small.png";
       } else if (element.result === "sad") {
-        face="Surunaama.png";
+        face="Surunaama_small.png";
       }
-      $item = $('<div>' + '<img src=' + face + '>' + ' ' + time + '</div>');
+      $item = $('<div class="feedrow">' + '<img class="smallface" src=' + face + '>' + ' ' + time + '</div>');
       $resultContainer.append($item);
     });
   });
