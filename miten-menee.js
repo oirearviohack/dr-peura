@@ -43,15 +43,16 @@ function loadResults() {
   return theData;
 }
 
+
 // TODO: Implement learning algorithm here to forward user to professional care.
 function analyzeResults() {
-  var sadCount = theData.slice().reverse().slice(0,10).filter(function(item) {
+  var sadCount = theData.slice().reverse().slice(0,5).filter(function(item) {
     return item.result == "sad";
   }).length
 
   console.log("sadCount: " + sadCount);
 
-  if (sadCount > 5) {
+  if (sadCount >= 5) {
     selectPage("call-help-page");
   }
 }
@@ -117,19 +118,15 @@ $( document ).ready(function() {
     var $thankYouText = $('#thankYouText');
     $thankYouText.hide();
 
-    var $feedbackButtons = $('button.feedback');
+    var $feedbackButtons = $('img.feedback');
     $feedbackButtons.click( function() {
-      var buttonId = $(this).attr("id");
-      console.log("clikced: " + buttonId);
+      var imgId = $(this).attr("id");
+      console.log("clikced: " + imgId);
 
-      if (buttonId.indexOf('happy') > -1) {
-        storeFeedback('happy', function() {
-          console.log("Stored happy");
-        });
+      if (imgId.indexOf('happy') > -1) {
+        storeFeedback('happy');
       } else {
-        storeFeedback('sad', function() {
-          console.log("Stored sad");
-        });
+        storeFeedback('sad');
       }
 
       $feedbackButtons.attr("disabled", true);
@@ -139,7 +136,7 @@ $( document ).ready(function() {
         $feedbackButtons.attr("disabled", false);
         $thankYouText.hide();
         analyzeResults();
-      }, 1500);
+      }, 500);
     });
     console.log($feedbackButtons);
 
