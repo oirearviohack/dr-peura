@@ -69,11 +69,11 @@ function renderResultsPage() {
     var time = moment(element.time).fromNow();
     var face = "";
     if (element.result === "happy") {
-      face="Hymynaama.png";
+      face="Hymynaama_small.png";
     } else if (element.result === "sad") {
-      face="Surunaama.png";
+      face="Surunaama_small.png";
     }
-    $item = $('<div>' + '<img src=' + face + '>' + ' ' + time + '</div>');
+    $item = $('<div class="feedrow">' + '<img class="smallface" src=' + face + '>' + ' ' + time + '</div>');
     $resultContainer.append($item);
   });
 }

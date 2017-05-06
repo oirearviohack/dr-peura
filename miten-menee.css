@@ -37,3 +37,13 @@
 .feedback#feedback-happy {
   padding-right: 5em;
 }
+
+.feedrow {
+  padding-top: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.smallface {
+  padding-right: 2px;
+}
