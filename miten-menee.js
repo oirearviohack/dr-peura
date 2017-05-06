@@ -69,12 +69,12 @@ $( document ).ready(function() {
     var $thankYouText = $('#thankYouText');
     $thankYouText.hide();
 
-    var $feedbackButtons = $('button.feedback');
+    var $feedbackButtons = $('img.feedback');
     $feedbackButtons.click( function() {
-      var buttonId = $(this).attr("id");
-      console.log("clikced: " + buttonId);
+      var imgId = $(this).attr("id");
+      console.log("clikced: " + imgId);
 
-      if (buttonId.indexOf('happy') > -1) {
+      if (imgId.indexOf('happy') > -1) {
         storeFeedback('happy');
       } else {
         storeFeedback('sad');
