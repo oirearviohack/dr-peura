@@ -56,7 +56,9 @@ function loadResults(callback) {
   $.getJSON(url, function(result) {
     var resultsArray = result.entry;
     console.log(result.entry);
-
+    if (resultsArray==undefined) {
+      resultsArray = [];
+    }
     var dataArray = resultsArray.map(function(item) {
       return { result: item.resource.valueString, time: item.resource.effectiveDateTime };
     }).sort(function(a, b) { return a.time.localeCompare(b.time); }).reverse();
