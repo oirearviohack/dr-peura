@@ -66,7 +66,13 @@ function renderResultsPage() {
     console.log(element);
 
     var time = moment(element.time).fromNow();
-    $item = $('<div>' + element.result + ' (' + time + ')</div>');
+    var face = "";
+    if (element.result === "happy") {
+      face="Hymynaama.png";
+    } else if (element.result === "sad") {
+      face="Surunaama.png";
+    }
+    $item = $('<div>' + '<img src=' + face + '>' + ' ' + time + '</div>');
     $resultContainer.append($item);
   });
 }
