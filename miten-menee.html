@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- load MUI -->
+    <link href="miten-menee.css" rel="stylesheet" type="text/css" />
+    <link href="http://cdn.muicss.com/mui-0.9.16/css/mui.min.css" rel="stylesheet" type="text/css" />
+    <script src="http://cdn.muicss.com/mui-0.9.16/js/mui.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js"></script>
+    <script src="miten-menee.js"></script>
+  </head>
+  <body>
+
+    <div class="mui-appbar">
+      <table width="100%">
+        <tr style="vertical-align:middle;">
+          <td class="mui--appbar-height">
+            <div class="mui-dropdown">
+              <button class="mui-btn mui-btn--primary" data-mui-toggle="dropdown">
+                <a href="#menu" class="box-shadow-menu">Mi</a>
+              </button>
+              <ul class="mui-dropdown__menu">
+                <li><a id="feedback-page" class="menu-item" href="#feedback">Miten menee</a></li>
+                <li><a id="results-page" class="menu-item" href="#results">Miten on mennyt</a></li>
+                <li><a id="call-help-page" class="menu-item" href="#call">Soita apua</a></li>
+                <li><a id="login-page" class="menu-item" href="#login">Kirjaudu ulos</a></li>
+              </ul>
+            </div>
+            Miten Menee
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="page login-page">
+      <div class="content">
+        <form id="login-form" class="mui-form" action="#">
+          <legend>Kirjaudu sovellukseen</legend>
+          <div class="mui-textfield">
+            <input type="text" placeholder="Nimimerkki">
+          </div>
+          <input type="submit" value="Sisälle!" class="mui-btn mui-btn--primary mui-btn--raised"></input>
+        </form>
+      </div>
+    </div>
+
+    <div class="page hidden feedback-page">
+      <!-- example content -->
+      <div class="mui-container">
+        <div class="mui-panel">
+          <button id="feedback-happy" class="feedback mui-btn mui-btn--primary mui-btn--raised">Happy</button>
+          <button id="feedback-sad" class="feedback mui-btn mui-btn--primary mui-btn--raised">Sad</button>
+          <h2 id='thankYouText'>Tallennettu, kiitos!</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="page hidden results-page">
+      <!-- example content -->
+      <div class="mui-container">
+        <div class="mui-panel">
+          <h1>Miten on mennyt</h1>
+          <div id='results'></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page hidden call-help-page">
+      <!-- example content -->
+      <div class="mui-container">
+        <div class="mui-panel">
+          <h1>Call help</h1>
+          <button class="mui-btn mui-btn--primary mui-btn--raised">My Button</button>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
