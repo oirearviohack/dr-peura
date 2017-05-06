@@ -15,10 +15,24 @@ function loadResults() {
   return theData;
 }
 
+// TODO: Implement learning algorithm here to forward user to professional care.
+function analyzeResults() {
+  var sadCount = theData.slice().reverse().slice(0,10).filter(function(item) {
+    return item.result == "sad";
+  }).length
+
+  console.log("sadCount: " + sadCount);
+
+  if (sadCount > 5) {
+    selectPage("call-help-page");
+  }
+}
+
 function renderResultsPage() {
   clearResultsPage();
 
-  var results = loadResults().reverse();
+  // slice makes a copy of the array:
+  var results = loadResults().slice().reverse();
   var $resultContainer = $('div#results');
   results.forEach(function(element) {
     console.log(element);
@@ -86,6 +100,7 @@ $( document ).ready(function() {
       setTimeout(function() {
         $feedbackButtons.attr("disabled", false);
         $thankYouText.hide();
+        analyzeResults();
       }, 1500);
     });
     console.log($feedbackButtons);
