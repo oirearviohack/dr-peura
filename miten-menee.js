@@ -6,9 +6,37 @@ userName = "";
 // TODO: Move this to oda-phr
 theData = [];
 
-function storeFeedback(happyOrSad) {
+function storeFeedback(happyOrSad, callback) {
   var time = moment().format();
-  theData.push({'time': time, 'result': happyOrSad});
+  var jsonData = createObservation(happyOrSad);
+
+  console.log("Storing " + happyOrSad + "!");
+  // POST https://oda.medidemo.fi/phr/baseDstu3/Observation?_format=json&_pretty=true
+  // theData.push({'time': time, 'result': happyOrSad});
+  $.post(
+    "https://oda.medidemo.fi/phr/baseDstu3/Observation?_format=json&_pretty=true",
+    jsonData,
+    callback,
+    "application/fhir+json; charset=UTF-8"
+  );
+}
+
+function createObservation(result) {
+  return {
+    "resourceType": "Observation",
+    "meta": {
+      "versionId": "1"
+    },
+    "code": {
+      "text": "Miten menee"
+    },
+    "status": "final",
+    "subject": {
+      "reference": "Patient/" + userName
+    },
+    "effectiveDateTime": moment().format(),
+    "valueString": result
+  }
 }
 
 function loadResults() {
@@ -17,13 +45,13 @@ function loadResults() {
 
 // TODO: Implement learning algorithm here to forward user to professional care.
 function analyzeResults() {
-  var sadCount = theData.slice().reverse().slice(0,5).filter(function(item) {
+  var sadCount = theData.slice().reverse().slice(0,10).filter(function(item) {
     return item.result == "sad";
   }).length
 
   console.log("sadCount: " + sadCount);
 
-  if (sadCount >= 5) {
+  if (sadCount > 5) {
     selectPage("call-help-page");
   }
 }
@@ -83,15 +111,19 @@ $( document ).ready(function() {
     var $thankYouText = $('#thankYouText');
     $thankYouText.hide();
 
-    var $feedbackButtons = $('img.feedback');
+    var $feedbackButtons = $('button.feedback');
     $feedbackButtons.click( function() {
-      var imgId = $(this).attr("id");
-      console.log("clikced: " + imgId);
+      var buttonId = $(this).attr("id");
+      console.log("clikced: " + buttonId);
 
-      if (imgId.indexOf('happy') > -1) {
-        storeFeedback('happy');
+      if (buttonId.indexOf('happy') > -1) {
+        storeFeedback('happy', function() {
+          console.log("Stored happy");
+        });
       } else {
-        storeFeedback('sad');
+        storeFeedback('sad', function() {
+          console.log("Stored sad");
+        });
       }
 
       $feedbackButtons.attr("disabled", true);
@@ -101,7 +133,7 @@ $( document ).ready(function() {
         $feedbackButtons.attr("disabled", false);
         $thankYouText.hide();
         analyzeResults();
-      }, 500);
+      }, 1500);
     });
     console.log($feedbackButtons);
 
