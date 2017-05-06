@@ -16,10 +16,13 @@ function loadResults() {
 }
 
 function renderResultsPage() {
-  var results = loadResults();
+  clearResultsPage();
+
+  var results = loadResults().reverse();
   var $resultContainer = $('div#results');
   results.forEach(function(element) {
     console.log(element);
+
     var time = moment(element.time).fromNow();
     $item = $('<div>' + element.result + ' (' + time + ')</div>');
     $resultContainer.append($item);
@@ -46,6 +49,7 @@ function selectPage(pageName) {
 }
 
 $( document ).ready(function() {
+    moment.locale('fi');
     console.log("ready!");
 
     $('a.menu-item').click( function() {
